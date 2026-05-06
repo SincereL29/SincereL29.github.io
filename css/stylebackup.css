@@ -1,0 +1,70 @@
+body {
+    font-family: "Playwrite IE", cursive;
+    background-image: url(https://media.cnn.com/api/v1/images/stellar/prod/230208002315-01b-lebron-james-gallery-restricted.jpg?q=w_3000,c_fill);
+
+
+}
+
+h1 {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
+
+h2 {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
+
+p {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
+
+article {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
+
+details {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
+
+time {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
+
+section {
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+
+}
+
+footer {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border: 2px solid black;
+    padding: 10px;
+}
