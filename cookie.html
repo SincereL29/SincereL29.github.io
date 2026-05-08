@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker</title>
+</head>
+
+<body>
+    <img src="pngtree-chocolate-chip-cookie-with-chips-png-image_15957700.png" alt="Cookies" width="400" id="cookie"
+        onclick="cookieClick()">
+
+
+    <div id="score">
+
+    </div>
+    <details id="Upgrades">
+
+        <button id="autoButton" onclick="autoClickUpgrade()">Upgrade Auto-Click (100 clicks)</button>
+        <button id="multiButton" onclick="clickMultiUprgrade()">Upgrade Click Multiplier (100 clicks)</button>
+
+    </details>
+
+</body>
+<script>
+
+    //configuration
+    var autoClickAmount = 0;
+    var autoClickCostPerLevel = 100;
+    var autoClickCost = 100;
+
+    // clickMulti
+    var clickMulti = 1;
+    var clickMultiCostPerLevel = 100;
+    var clickMultiCost = 100;
+
+
+    var score = 0
+    var scoreBox = document.getElementById("score")
+    var autoButton = document.getElementById("autoButton")
+    var multiButton = document.getElementById("multiButton")
+
+    function cookieClick() {
+        score = score + (1 * clickMulti);
+        scoreBox.innerHTML = score;
+        saveGame();
+
+    }
+
+    function autoClickUpgrade() {
+        if (score >= autoClickCost) {
+            score = score - autoClickCost;
+            autoClickAmount = autoClickAmount + 1;
+            autoClickCost = autoClickCost + autoClickCostPerLevel;
+            autoButton.innerHTML = "Upgrade Auto-Click (" + autoClickCost + " clicks)";
+            scoreBox.innerHTML = score;
+            saveGame();
+        }
+    }
+
+
+
+    function clickMultiUprgrade() {
+        if (score >= clickMultiCost) {
+            score = score - clickMultiCost;
+            clickMulti = clickMulti + 1;
+            clickMultiCost = autoClickCost + clickMultiCostPerLevel;
+            multiButton.innerHTML = "Upgrade Click Multiplier (" + clickMultiCost + " clicks)";
+            scoreBox.innerHTML = score;
+            saveGame();
+        }
+    }
+
+    function autoClick() {
+        score = score + (1 * autoClickAmount)
+        scoreBox.innerHTML = score;
+        saveGame();
+    }
+
+    function SaveGame() {
+
+        var saveData = {
+            //configuration
+            autoClickAmount: autoClickAmount,
+            autoClickCostPerLevel: autoClickCostPerLevel,
+            autoClickCost: autoClickCost,
+
+            // clickMulti
+            clickMulti: clickMulti,
+            clickMultiCostPerLevel: clickMultiCostPerLevel,
+            clickMultiCost: clickMultiCost,
+
+
+            score: score,
+        }
+        var saveText = JSON.stringify(saveData);
+
+        document.cookie = saveText;
+    }
+
+    function LoadGame() {
+        var cookieText = document.cookie;
+
+        cookieText = JSON.parse(cookieText);
+
+        autoClickAmount = cookieText.autoClickAmount;
+            autoClickCostPerLevel = cookieText.autoClickCostPerLevel;
+            autoClickCost = cookieText.autoClickCost;
+            clickMulti = cookieText.clickMulti;
+            clickMultiCostPerLevel = cookieText.clickMultiCostPerLevel;
+            clickMultiCost = cookieText.clickMultiCost;
+            score = cookieText.score;
+    }
+
+    setInterval(autoClick, 250)
+    LoadGame();
+</script>
+
+</html>

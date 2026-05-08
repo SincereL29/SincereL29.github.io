@@ -1,0 +1,28 @@
+<canvas id="game" width="400" height="400"></canvas>
+<script>
+let c=document.getElementById("game");
+let ctx=c.getContext("2d");
+
+let grid = Array(20).fill().map(()=>Array(20).fill(0));
+
+c.addEventListener("click", e=>{
+  let rect=c.getBoundingClientRect();
+  let x=Math.floor((e.clientX-rect.left)/20);
+  let y=Math.floor((e.clientY-rect.top)/20);
+  grid[y][x]=1;
+});
+
+function draw(){
+  ctx.clearRect(0,0,400,400);
+  for(let y=0;y<20;y++){
+    for(let x=0;x<20;x++){
+      if(grid[y][x]){
+        ctx.fillRect(x*20,y*20,20,20);
+      }
+      ctx.strokeRect(x*20,y*20,20,20);
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
