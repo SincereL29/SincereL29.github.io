@@ -1,388 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Dodge!</title>
-<style>
-body{margin:0;overflow:hidden;background:black;font-family:Arial;}
-canvas{display:block;}
-#menu{position:absolute;inset:0;background:rgba(0,0,0,0.92);color:white;overflow-y:auto;padding:30px;}
-.levelCard{border:2px solid white;padding:15px;margin:12px 0;background:rgba(255,255,255,0.03);}
-button{padding:10px 18px;margin:6px;cursor:pointer;font-size:15px;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All About Sincere</title>
 
-#modalOverlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.75);
-  z-index:9999;
-  align-items:center;
-  justify-content:center;
-}
-#modalOverlay.open{display:flex;}
-#modalBox{
-  background:#111;
-  color:white;
-  border:2px solid cyan;
-  border-radius:10px;
-  padding:28px 32px;
-  max-width:480px;
-  width:90%;
-  max-height:80vh;
-  overflow-y:auto;
-  position:relative;
-  white-space:pre-line;
-}
-#modalClose{
-  position:absolute;
-  top:10px;
-  right:14px;
-  background:none;
-  border:none;
-  color:white;
-  font-size:26px;
-  cursor:pointer;
-  line-height:1;
-  padding:0 4px;
-}
-#modalClose:hover{color:cyan;}
-</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+IE:wght@100..400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+
 </head>
+
 <body>
-<canvas id="game"></canvas>
-<div id="menu">
-  <h1>Dodge!</h1>
-  <div id="levelSelect"></div>
-</div>
+    <h1>All About Sincere</h1>
 
-<div id="modalOverlay">
-  <div id="modalBox">
-    <button id="modalClose" aria-label="Close">×</button>
-    <div id="modalContent"></div>
-  </div>
-</div>
+    <nav>
+        <a href="index.html"><button>Home Page</button></a>
+        <a href="about.html"><button>About Page</button></a>
+        <a href="GetToSchool7/index.html"><button>RPG Game</button></a>
+        <a href="cookie.html"><button>Cookie Clicker</button></a>
+    </nav>
 
-<script>
-window.addEventListener("DOMContentLoaded",()=>{
+    <h2>What you can find here</h2>
+    <li>
+        <ul>My Hobbies & More</ul>
+        <p>You can find this by clicking the " About Page " button, there you will find my hobbies, opinions/hot takes, and I even added my top 3 animes on there.</p>
+        <br>
+        <ul>My RPG Maker</ul>
+        <p>You can find this by clicking the " RPG Game " button, there you will find my RPG Game that I made in class using RPG Maker MZ called Get to School 7. GTS7 is a game revolving around Reid and his sister Ela who live alone, working their way as a swordsman ever since magic powers were randomly brought to earth. Since Magic Powers were brought to earth, school moved down from being a priority so even smaller paycheck for teachers. This made all teachers quit their jobs and schools were all eventually shut down. The Goal of Reid of Ela is to defeat the one who brought the Magic Powers because his very existence is why magic powers are real in their universe.
+        </p>
+        <br>
+        <ul>My Cookie Clicker</ul>
+        <p>You can find this by clicking the " Cookie Clicker " button, there you will find and be able to play my Cookie Clicker game.</p>
+    </li>
 
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-const menu=document.getElementById("menu");
-const levelSelect=document.getElementById("levelSelect");
-const modalOverlay=document.getElementById("modalOverlay");
-const modalContent=document.getElementById("modalContent");
-const modalClose=document.getElementById("modalClose");
-
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-addEventListener("resize",()=>{canvas.width=innerWidth;canvas.height=innerHeight;});
-
-modalClose.onclick=()=>modalOverlay.classList.remove("open");
-modalOverlay.addEventListener("click",e=>{if(e.target===modalOverlay)modalOverlay.classList.remove("open");});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")modalOverlay.classList.remove("open");});
-
-let keys={};
-let mouse={x:0,y:0};
-let player,beams=[],bullets=[],food=[];
-let boss=null,safeZone=null;
-let level=1,unlockedLevel=1;
-let running=false;
-let beamTimer=0,frame=0;
-let dashCooldown=0,dashTimer=0,dashVX=0,dashVY=0;
-let shieldTimer=0,invisTimer=0,gunTimer=0,spawnIFrames=0;
-let levelTimer=0,requiredTime=0,outsideTimer=0;
-let upgrades={maxHealth:3,speedBonus:0,smallerHitbox:0,dashReduce:0,gunDuration:0,shieldDuration:0};
-
-addEventListener("keydown",e=>{
-  keys[e.key.toLowerCase()]=true;
-  if(e.code==="Space"&&dashCooldown<=0)dash();
-});
-addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;});
-canvas.addEventListener("mousemove",e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
-canvas.addEventListener("mousedown",()=>{if(player&&player.hasGun)shoot();});
-
-function getLevelChanges(lvl){
-  let changes=[];
-  if(lvl===1){changes.push("Tutorial level introduced","Basic enemy beams","Dash mechanic introduced","Powerups introduced");}
-  if(lvl===2)changes.push("NEW: Pattern burst attacks");
-  if(lvl===3)changes.push("NEW: Homing beams");
-  if(lvl===4){changes.push("More beam density","Faster spawn rate");}
-  if(lvl===5){changes.push("NEW: Boss fight","Permanent upgrades unlocked");}
-  if(lvl===6){changes.push("NEW: Safe Zone mechanic","NEW: Bounce beams","Arena movement now required");}
-  if(lvl===7){changes.push("Safe Zone pressure increased","Higher enemy speed");}
-  if(lvl===8)changes.push("NEW: Split beams");
-  if(lvl===9)changes.push("Bounce beam frequency increased");
-  if(lvl===10){changes.push("NEW: Advanced boss fight","Boss + Safe Zone combination");}
-  if(lvl>10){if(lvl%5===0)changes.push("NEW: Stronger boss tier");changes.push("Higher beam density","Higher enemy speed","Harder survival scaling");}
-  return changes;
-}
-
-function buildMenu(){
-  levelSelect.innerHTML="";
-  for(let i=1;i<=Math.max(15,unlockedLevel);i++){
-    let card=document.createElement("div");
-    card.className="levelCard";
-    let title=document.createElement("h2");
-    title.innerText="Level "+i;
-    let play=document.createElement("button");
-    play.innerText=i<=unlockedLevel?"Play":"Locked";
-    play.disabled=i>unlockedLevel;
-    play.onclick=()=>startLevel(i);
-    let info=document.createElement("button");
-    info.innerText="Info";
-    info.onclick=()=>showInfo(i);
-    card.appendChild(title);card.appendChild(play);card.appendChild(info);
-    levelSelect.appendChild(card);
-  }
-}
-
-function showInfo(lvl){
-  let text="LEVEL "+lvl+"\n\n";
-  text+="====================\nWHAT CHANGED\n====================\n\n";
-  let changes=getLevelChanges(lvl);
-  if(changes.length===0){text+="No major mechanic changes.\nDifficulty scaling increased.\n";}
-  else{for(let c of changes)text+="• "+c+"\n";}
-  text+="\n====================\nCURRENT FEATURES\n====================\n\n";
-  text+="Enemies:\n• Normal Beams\n";
-  if(lvl>=2)text+="• Pattern Bursts\n";
-  if(lvl>=3)text+="• Homing Beams\n";
-  if(lvl>=6)text+="• Bounce Beams\n";
-  if(lvl>=8)text+="• Split Beams\n";
-  text+="\nMechanics:\n• Dash Movement\n• Random Powerups\n• Spawn Invincibility\n";
-  if(lvl>=5)text+="• Permanent Upgrades\n";
-  if(lvl>=6)text+="• Safe Zone System\n";
-  text+="\nBoss:\n";
-  if(lvl%5===0)text+="• Boss Fight Active\n";
-  else text+="• No Boss Fight\n";
-  text+="\nReward:\n• Permanent Upgrade";
-  modalContent.innerText=text;
-  modalOverlay.classList.add("open");
-}
-
-buildMenu();
-
-function startLevel(lvl){
-  level=lvl;running=true;menu.style.display="none";
-  player={x:canvas.width/2,y:canvas.height/2,size:22-upgrades.smallerHitbox,hp:upgrades.maxHealth,speedBoost:0,hasGun:false};
-  beams=[];bullets=[];food=[];boss=null;
-  dashCooldown=0;dashTimer=0;shieldTimer=0;invisTimer=0;gunTimer=0;spawnIFrames=180;
-  levelTimer=0;requiredTime=10+level*6;beamTimer=0;outsideTimer=0;
-  if(level>=6)createSafeZone();else safeZone=null;
-  if(level%5===0)spawnBoss();
-}
-
-function endLevel(){
-  running=false;
-  if(level>=unlockedLevel)unlockedLevel=level+1;
-  chooseUpgrade();buildMenu();menu.style.display="block";
-}
-
-function chooseUpgrade(){
-  let r=Math.random();
-  if(r<0.16)upgrades.maxHealth++;
-  else if(r<0.32)upgrades.speedBonus++;
-  else if(r<0.48)upgrades.smallerHitbox++;
-  else if(r<0.64)upgrades.dashReduce+=10;
-  else if(r<0.8)upgrades.gunDuration+=120;
-  else upgrades.shieldDuration+=120;
-}
-
-function createSafeZone(){safeZone={x:100+Math.random()*(canvas.width-200),y:100+Math.random()*(canvas.height-200),radius:140};}
-
-/* ===== SAFE ZONE (MODIFIED ONLY HERE) ===== */
-function updateSafeZone(){
-  if(!safeZone)return;
-  if(frame%360===0)createSafeZone();
-
-  ctx.beginPath();
-  ctx.strokeStyle="lime";
-  ctx.lineWidth=5;
-  ctx.arc(safeZone.x,safeZone.y,safeZone.radius,0,Math.PI*2);
-  ctx.stroke();
-
-  let dist=Math.hypot(player.x-safeZone.x,player.y-safeZone.y);
-
-  if(dist>safeZone.radius){
-    outsideTimer++;
-    ctx.fillStyle="red";
-    ctx.fillText("RETURN TO SAFE ZONE",canvas.width/2-120,80);
-    if(outsideTimer>180)player.hp=0;
-  } else {
-    outsideTimer=0;
-
-    // SIGNIFICANT HEALING WHILE INSIDE SAFE ZONE
-    player.hp = Math.min(upgrades.maxHealth, player.hp + 0.12);
-  }
-}
-/* ===== END SAFE ZONE EDIT ===== */
-
-function spawnBoss(){boss={x:canvas.width/2,y:120,hp:100+level*15,angle:0};}
-
-function updateBoss(){
-  if(!boss)return;
-  ctx.fillStyle="darkred";ctx.fillRect(boss.x-60,boss.y-60,120,120);
-  boss.angle+=0.04;
-  if(frame%20===0){
-    for(let i=0;i<12;i++){
-      let a=boss.angle+(Math.PI*2/12)*i;
-      beams.push({x:boss.x,y:boss.y,w:14,h:14,dx:Math.cos(a)*7,dy:Math.sin(a)*7,type:"normal"});
-    }
-  }
-}
-
-function dash(){
-  dashCooldown=Math.max(35,120-upgrades.dashReduce);
-  let mx=0,my=0;
-  if(keys["w"])my-=1;if(keys["s"])my+=1;if(keys["a"])mx-=1;if(keys["d"])mx+=1;
-  if(mx===0&&my===0){let a=Math.atan2(mouse.y-player.y,mouse.x-player.x);mx=Math.cos(a);my=Math.sin(a);}
-  let len=Math.hypot(mx,my);if(len){mx/=len;my/=len;}
-  dashVX=mx*24;dashVY=my*24;dashTimer=12;
-}
-
-function shoot(){
-  let a=Math.atan2(mouse.y-player.y,mouse.x-player.x);
-  bullets.push({x:player.x,y:player.y,dx:Math.cos(a)*13,dy:Math.sin(a)*13});
-}
-
-function updateBullets(){
-  ctx.fillStyle="yellow";
-  for(let i=bullets.length-1;i>=0;i--){
-    let b=bullets[i];b.x+=b.dx;b.y+=b.dy;ctx.fillRect(b.x,b.y,6,6);
-    for(let j=beams.length-1;j>=0;j--){
-      let e=beams[j];
-      if(b.x<e.x+e.w&&b.x+6>e.x&&b.y<e.y+e.h&&b.y+6>e.y){beams.splice(j,1);bullets.splice(i,1);break;}
-    }
-  }
-}
-
-function spawnFood(){
-  if(Math.random()<0.012){
-    let r=Math.random(),type;
-    if(r<0.25)type="shield";else if(r<0.5)type="invis";else if(r<0.7)type="gun";else if(r<0.85)type="speed";else type="dash";
-    food.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,type});
-  }
-}
-
-function updateFood(){
-  for(let i=food.length-1;i>=0;i--){
-    let f=food[i];
-    if(f.type==="shield")ctx.fillStyle="blue";
-    if(f.type==="invis")ctx.fillStyle="purple";
-    if(f.type==="gun")ctx.fillStyle="orange";
-    if(f.type==="speed")ctx.fillStyle="lime";
-    if(f.type==="dash")ctx.fillStyle="white";
-    ctx.fillRect(f.x,f.y,16,16);
-    if(Math.hypot(player.x-f.x,player.y-f.y)<30){
-      if(f.type==="shield")shieldTimer=360+upgrades.shieldDuration;
-      if(f.type==="invis")invisTimer=360;
-      if(f.type==="gun"){player.hasGun=true;gunTimer=600+upgrades.gunDuration;}
-      if(f.type==="speed")player.speedBoost=240;
-      if(f.type==="dash")dashCooldown=0;
-      food.splice(i,1);
-    }
-  }
-}
-
-function spawnBeam(){
-  let amount=1+Math.floor(level*0.7);
-  for(let i=0;i<amount;i++){
-    let side=Math.floor(Math.random()*4);
-    let beam={
-      x:side===0?-40:side===1?canvas.width+40:Math.random()*canvas.width,
-      y:side===2?-40:side===3?canvas.height+40:Math.random()*canvas.height,
-      w:14,h:14,
-      dx:side===0?6+level:side===1?-(6+level):0,
-      dy:side===2?6+level:side===3?-(6+level):0,
-      type:"normal"
-    };
-    if(level>=3&&Math.random()<0.2)beam.type="homing";
-    if(level>=6&&Math.random()<0.16)beam.type="bounce";
-    if(level>=8&&Math.random()<0.12)beam.type="split";
-    beams.push(beam);
-  }
-}
-
-function spawnPattern(){
-  let count=8+level*2;
-  for(let i=0;i<count;i++){
-    let a=(Math.PI*2/count)*i;
-    beams.push({x:canvas.width/2,y:canvas.height/2,w:14,h:14,dx:Math.cos(a)*(5+level),dy:Math.sin(a)*(5+level),type:"normal"});
-  }
-}
-
-function hitPlayer(){
-  if(shieldTimer>0||spawnIFrames>0)return;
-  player.hp--;spawnIFrames=60;
-  if(player.hp<=0){running=false;buildMenu();menu.style.display="block";}
-}
-
-function updateBeams(){
-  beamTimer--;
-  if(beamTimer<=0){
-    if(level===1)spawnBeam();
-    else{if(Math.random()<0.5)spawnPattern();else spawnBeam();}
-    beamTimer=Math.max(10,40-level*2);
-  }
-  for(let i=beams.length-1;i>=0;i--){
-    let b=beams[i];
-    if(b.type==="homing"){let a=Math.atan2(player.y-b.y,player.x-b.x);b.dx+=Math.cos(a)*0.1;b.dy+=Math.sin(a)*0.1;}
-    b.x+=b.dx;b.y+=b.dy;
-    if(b.type==="bounce"){if(b.x<0||b.x>canvas.width)b.dx*=-1;if(b.y<0||b.y>canvas.height)b.dy*=-1;}
-    ctx.fillStyle=b.type==="homing"?"magenta":b.type==="bounce"?"cyan":b.type==="split"?"orange":"red";
-    ctx.fillRect(b.x,b.y,b.w,b.h);
-    if(player.x<b.x+b.w&&player.x+player.size>b.x&&player.y<b.y+b.h&&player.y+player.size>b.y){
-      hitPlayer();
-      if(b.type==="split"){
-        for(let k=0;k<4;k++){let a=(Math.PI*2/4)*k;beams.push({x:b.x,y:b.y,w:10,h:10,dx:Math.cos(a)*8,dy:Math.sin(a)*8,type:"normal"});}
-      }
-      beams.splice(i,1);
-    }
-    if(b.x<-300||b.x>canvas.width+300||b.y<-300||b.y>canvas.height+300)beams.splice(i,1);
-  }
-}
-
-function updatePlayer(){
-  let speed=6+upgrades.speedBonus;
-  if(player.speedBoost>0){speed=10+upgrades.speedBonus;player.speedBoost--;}
-  if(keys["w"])player.y-=speed;if(keys["s"])player.y+=speed;
-  if(keys["a"])player.x-=speed;if(keys["d"])player.x+=speed;
-  if(dashTimer>0){player.x+=dashVX;player.y+=dashVY;dashVX*=0.82;dashVY*=0.82;dashTimer--;}
-  if(gunTimer>0)gunTimer--;else player.hasGun=false;
-  ctx.fillStyle=shieldTimer>0?"blue":invisTimer>0?"purple":player.hasGun?"orange":player.speedBoost>0?"lime":"white";
-  if(spawnIFrames>0&&Math.floor(spawnIFrames/5)%2===0)ctx.globalAlpha=0.35;
-  ctx.fillRect(player.x,player.y,player.size,player.size);
-  ctx.globalAlpha=1;
-}
-
-function updateLevel(){levelTimer+=1/60;if(levelTimer>=requiredTime)endLevel();}
-
-function loop(){
-  frame++;
-  ctx.fillStyle="black";ctx.fillRect(0,0,canvas.width,canvas.height);
-  if(running){
-    if(dashCooldown>0)dashCooldown--;
-    if(shieldTimer>0)shieldTimer--;
-    if(invisTimer>0)invisTimer--;
-    if(spawnIFrames>0)spawnIFrames--;
-    updateSafeZone();updatePlayer();spawnFood();updateFood();updateBullets();updateBeams();updateBoss();updateLevel();
-    ctx.fillStyle="white";ctx.font="18px Arial";
-    ctx.fillText("Level: "+level,20,30);ctx.fillText("HP: "+player.hp,20,55);
-    let remainingTime=Math.max(0,(requiredTime-levelTimer).toFixed(1));
-    ctx.font="28px Arial";ctx.fillStyle=remainingTime<=5?"red":"white";ctx.textAlign="center";
-    ctx.fillText("Survive: "+remainingTime+"s",canvas.width/2,40);ctx.textAlign="left";
-    ctx.font="18px Arial";ctx.fillStyle="white";
-    ctx.fillText("Blue = Shield",20,90);ctx.fillText("Purple = Invis",20,115);
-    ctx.fillText("Orange = Gun",20,140);ctx.fillText("Lime = Speed",20,165);ctx.fillText("White = Dash",20,190);
-    if(level>=6){
-      ctx.fillStyle="red";
-      ctx.fillText("Safe Zone Timer: "+Math.max(0,((180-outsideTimer)/60).toFixed(1)),20,230);
-    }
-  }
-  requestAnimationFrame(loop);
-}
-
-loop();
-});
-</script>
+     <footer>Made By S.Lovett 2026</footer>
 </body>
+
 </html>

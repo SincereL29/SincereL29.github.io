@@ -4,25 +4,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+IE:wght@100..400&display=swap" rel="stylesheet">
     <title>Cookie Clicker</title>
+
+    <style>
+        body {
+            background-color: rgb(134, 187, 216);
+            font-family: "Playwrite IE", cursive;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #cookie {
+            width: 300px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        #cookie:hover {
+            transform: scale(1.05);
+        }
+
+        #cookie:active {
+            transform: scale(0.95);
+        }
+
+        #score {
+            font-size: 40px;
+            margin: 20px;
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+        }
+
+        button {
+            background-color: rgb(0, 47, 255);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 10px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: rgb(0, 85, 255);
+        }
+
+        #Upgrades {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
-    <img src="pngtree-chocolate-chip-cookie-with-chips-png-image_15957700.png" alt="Cookies" width="400" id="cookie"
+    <h1>Cookie Clicker</h1>
+    <nav>
+        <a href="index.html"><button>Home Page</button></a>
+        <a href="about.html"><button>About Page</button></a>
+        <a href="GetToSchool7/index.html"><button>RPG Game</button></a>
+        <a href="cookie.html"><button>Cookie Clicker</button></a>
+    </nav>
+
+    <img src="pngtree-chocolate-chip-cookie-with-chips-png-image_15957700.png" alt="Cookies" id="cookie"
         onclick="cookieClick()">
 
-
     <div id="score">
-
+        0
     </div>
-    <details id="Upgrades">
 
-        <button id="autoButton" onclick="autoClickUpgrade()">Upgrade Auto-Click (100 clicks)</button>
-        <button id="multiButton" onclick="clickMultiUprgrade()">Upgrade Click Multiplier (100 clicks)</button>
+    <button id="autoButton" onclick="autoClickUpgrade()">
+        Upgrade Auto-Click (100 clicks)
+    </button>
 
-    </details>
+    <button id="multiButton" onclick="clickMultiUprgrade()">
+        Upgrade Click Multiplier (100 clicks)
+    </button>
+
 
 </body>
+
 <script>
 
     //configuration
@@ -35,52 +98,68 @@
     var clickMultiCostPerLevel = 100;
     var clickMultiCost = 100;
 
+    var score = 0;
 
-    var score = 0
-    var scoreBox = document.getElementById("score")
-    var autoButton = document.getElementById("autoButton")
-    var multiButton = document.getElementById("multiButton")
+    var scoreBox = document.getElementById("score");
+    var autoButton = document.getElementById("autoButton");
+    var multiButton = document.getElementById("multiButton");
 
     function cookieClick() {
         score = score + (1 * clickMulti);
         scoreBox.innerHTML = score;
-        saveGame();
-
+        SaveGame();
     }
 
     function autoClickUpgrade() {
         if (score >= autoClickCost) {
+
             score = score - autoClickCost;
+
             autoClickAmount = autoClickAmount + 1;
+
             autoClickCost = autoClickCost + autoClickCostPerLevel;
-            autoButton.innerHTML = "Upgrade Auto-Click (" + autoClickCost + " clicks)";
+
+            autoButton.innerHTML =
+                "Upgrade Auto-Click (" + autoClickCost + " clicks)";
+
             scoreBox.innerHTML = score;
-            saveGame();
+
+            SaveGame();
         }
     }
 
-
-
     function clickMultiUprgrade() {
+
         if (score >= clickMultiCost) {
+
             score = score - clickMultiCost;
+
             clickMulti = clickMulti + 1;
-            clickMultiCost = autoClickCost + clickMultiCostPerLevel;
-            multiButton.innerHTML = "Upgrade Click Multiplier (" + clickMultiCost + " clicks)";
+
+            clickMultiCost = clickMultiCost + clickMultiCostPerLevel;
+
+            multiButton.innerHTML =
+                "Upgrade Click Multiplier (" + clickMultiCost + " clicks)";
+
             scoreBox.innerHTML = score;
-            saveGame();
+
+            SaveGame();
         }
     }
 
     function autoClick() {
-        score = score + (1 * autoClickAmount)
+
+        score = score + (1 * autoClickAmount);
+
         scoreBox.innerHTML = score;
-        saveGame();
+
+        SaveGame();
     }
 
     function SaveGame() {
 
         var saveData = {
+
             //configuration
             autoClickAmount: autoClickAmount,
             autoClickCostPerLevel: autoClickCostPerLevel,
@@ -91,30 +170,46 @@
             clickMultiCostPerLevel: clickMultiCostPerLevel,
             clickMultiCost: clickMultiCost,
 
-
             score: score,
         }
+
         var saveText = JSON.stringify(saveData);
 
         document.cookie = saveText;
     }
 
     function LoadGame() {
-        var cookieText = document.cookie;
 
-        cookieText = JSON.parse(cookieText);
+        if (document.cookie != "") {
 
-        autoClickAmount = cookieText.autoClickAmount;
+            var cookieText = document.cookie;
+
+            cookieText = JSON.parse(cookieText);
+
+            autoClickAmount = cookieText.autoClickAmount;
             autoClickCostPerLevel = cookieText.autoClickCostPerLevel;
             autoClickCost = cookieText.autoClickCost;
+
             clickMulti = cookieText.clickMulti;
             clickMultiCostPerLevel = cookieText.clickMultiCostPerLevel;
             clickMultiCost = cookieText.clickMultiCost;
+
             score = cookieText.score;
+
+            scoreBox.innerHTML = score;
+
+            autoButton.innerHTML =
+                "Upgrade Auto-Click (" + autoClickCost + " clicks)";
+
+            multiButton.innerHTML =
+                "Upgrade Click Multiplier (" + clickMultiCost + " clicks)";
+        }
     }
 
-    setInterval(autoClick, 250)
+    setInterval(autoClick, 250);
+
     LoadGame();
+
 </script>
 
 </html>
